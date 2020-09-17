@@ -1,0 +1,85 @@
+ㅡ mybatis 쓰는방법 
+구글에서 maven mybatis 검색 제일위에꺼(org.mybatis - Maven Repository) 클릭 - mybatis - 3.5.5클릭 - 
+maven 복사해서 밑에 붙여넣기
+
+pom.xml에서
+test 검색후
+<dependency>
+	<groupId>junit</groupId>
+	<artifactId>junit</artifactId>
+	<version>4.7</version>
+	<scope>test</scope>
+</dependency> 
+ㅡㅡㅡㅡㅡ여기다가 붙여넣기ㅡㅡㅡㅡㅡㅡㅡ 사실 위치는 상관없이 <dependencies> 안에만 있으면 된다고함 그냥 연관있는것끼리 모아놓으려고 한것
+<!-- https://mvnrepository.com/artifact/org.mybatis/mybatis -->
+<dependency>
+    <groupId>org.mybatis</groupId>
+    <artifactId>mybatis</artifactId>
+    <version>3.5.5</version>
+</dependency>
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+</dependencies>
+<build>
+
+ㅡ mybatis랑 spring이랑 연결시켜주는 프로그램
+maven mybatis-spring 검색 - org.mybatis » mybatis-spring - Maven Repository 클릭 - 제일위에버전클릭
+- Maven 복사 위처럼 붙여넣기
+
+mybatis랑 mybatis-spring 둘다 다운받아줘야함
+
+CP를 쓸거임 ( Connection pool )
+커넥션 만들때 리소스를 굉장히 많이잡아먹는데
+미리 여러개 만들어놓고 요청이 들어올때마다 한개씩 빌려주는거
+원래는 커넥션했다가 닫았다가 했는데 이제는 미리 몇개만들어놓고 빌려쓰는것
+hikaricp 다운받을꺼
+위의 maven 사이트에서 hikaricp 검색 or 구글에서 maven hikaricp 검색
+HikariCP - 최신버전을 위의 mybatis받을때처럼 다운로드
+
+JDBC 다운로드
+<dependency>
+	<groupId>org.springframework</groupId>
+	<artifactId>spring-jdbc</artifactId>                                     
+	<version>${org.springframework-version}</version>
+</dependency>
+
+//원래있던 얘에서 webmvc만 jdbc로 바꾼거
+//<dependency>
+//	<groupId>org.springframework</groupId>
+//	<artifactId>spring-webmvc</artifactId>
+//	<version>${org.springframework-version}</version>
+//</dependency>
+
+******중요한거 Maven Dependencies에서 spring으로 시작하는애들 버전이 전부 같아야함 *******
+
+jackson 다운로드
+maven jackson-databind 검색 - mvn 홈페이지 - 2.11.2(최신버전) 위의방법대로 다운로드
+maven이 좋은점 : jackson-databind가 필요로하는애들을 다 다운받아줌
+
+암호화 다운로드
+maven jbcrypt 검색 - mvn홈페이지 - 최신버전 위방법으로 다운로드
+
+입출력?(업로드,다운로드하는것?) 다운로드(io는 input, output의 줄임)
+maven commons-io 검색  - 위처럼 다운로드
+
+파일업로드 다운
+maven commons-fileupload 검색- 위처럼 다운로드
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ라이브러리 다운로드 끝ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+web.xml에 UTF-8인코딩설정
+<filter>
+	<filter-name>encodingFilter</filter-name>
+	<filter-class>
+		org.springframework.web.filter.CharacterEncodingFilter
+	</filter-class>
+	<init-param>
+		<param-name>encoding</param-name>
+		<param-value>UTF-8</param-value>
+	</init-param>
+	<init-param>
+		<param-name>forceEncoding</param-name>
+		<param-value>true</param-value>
+	</init-param>
+</filter>
+<filter-mapping>
+	<filter-name>encodingFilter</filter-name>
+	<url-pattern>/*</url-pattern>
+</filter-mapping>
