@@ -1,0 +1,177 @@
+﻿스프링은 자료가 엄청 방대하기때문에 이걸 다공부한다는건 말이 안됨
+나한테 필요한거만 학습해서 쓰는것
+스프링을 배우는 제일 큰 이유는 전자정부 프레임워크 때문 (얘가 버전이 4.? 버전이기때문에 5.?버전을 받지않음)
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+1. STS(Spring Tool Suite) 설치
+spring framework 공식홈페이지 - Projects - spring framework 설치
+(이클립스 깔았으면 밑처럼 STS 플러그인 설치하면됨)
+or
+Eclipse 에서 STS(Spring Tool Suite) 플러그인 설치
+- 이클립스 Help - Eclipse Marketplace - sts검색 - Spring tools 3 Add-On for Spring Tolls 4 3.9.14.RELEASE 인스톨 - 설치 다하고 리스타트뜨면 리스타트
+리스타트후 window - preferences에 Spring 있는지 확인
+
+이제부터 프로젝트 만들때 new - other - Spring - Spring Legacy Project - Spring MVC Project - Next - Yes
+- 패키지만들때 .은 최소2개 - finish (처음할때는 라이브러리를 다운받느라 꽤 오래걸림)
+
+(안해줘도 되긴하다고함)
+properties - Project Facets - Java 버전을 1.8(여기서 에러터져도 다시키면 잘됨, 안되면 그냥 1.6으로해도됨)
+- 오른쪽탭에 Runtimes - Apache Tomcat v9.0체크 (이러면 Apache Tomcat 라이브러리가 생김)
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ여기까지가 기본셋팅ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+WEB-INf의 web.xml- source - (web-app) 빼고 다 지움
+
+maven spring 검색 -> 컴파일빌더가 참조하는 사이트
+현재 3.1.1버전(Maven Dependencies 확인)인데 여기서 4.3.29 버전으로 업데이트 시킬것
+업데이트방법 : pom.xml에서 
+<org.springframework-version>3.1.1.RELEASE</org.springframework-version>
+여기서 3.1.1.RELEASE 이부분을 4.3.29.RELEASE로 바꿔줌
+그리고 저장을 하면 알아서 다운로드가 시작됨 다되면 Maven Dependencies에서 버전바꼇는지 확인
+
+스프링은 POJO(Plain Old java Object)를 기본으로 하고있음(쉽게쉽게 가볍게하자라는것)
+스프링의 특징
+- 가볍다
+- IoC (Inversion of Control) : 제어의 역행 =>쉽게말하면 콜백함수
+  (객체생성을 컨테이너한테 맡긴다) 
+  DI(Dependency Insection) : 의존성 주입 
+
+  Bean 등록!! 생성(New)은 컨테이너(스프링)이 직접 생성하고 우리는 관여X
+  우리가 직접만드는건 VO밖에 없다
+  우리는 Bean등록과 Bean을 달라는것만 배우면됨 그러면 스프링이 알아서 해줄거
+
+- AOP (Aspect Oriented Programming)
+  관점지향프로그래밍(우리가만든 JdbcTemplate가 이거라고 보면됨, 공통된부분은 놔두고 바뀌는부분만 따로뺌)
+
+
+polymorphism => 스프링을 하는게아니라 원래 자바개발을 이런식으로 해야한다는걸 보여주는것
+SamsungTV와 LgTV의 네이밍이 달라짐 -> 획일성이 떨어짐, 결함도가 높다
+EX) SamsungTV를 객체화한후에 LgTV로 바꿀때 전부다 바꿔줘야함 => 결함도가 높다
+   소스는 교체가 슥슥쉽게 되어야한다 -> 개발은 그렇게 해야함
+EX) 일체형 카메라와 단자로연결하는 카메라/ 일체형은 다뜯어내야하지만 단자카메라는 단자만빼서 거기에 맞는 카메라로바꿔주면된다 (이때 단자가 인터페이스라고보면됨)
+Tv인터페이스를 만들고 powerOn,powerOff,volumeUp,volumeDown 메소드를 만들어서 SamsungTv과 LgTv에implements시켜서 같은 네이밍을 쓰게 만들어줌
+그러면 TvTest 메인메소드에서 객체 생성할때 SamsungTV 부분만 LgTV로 바꿔주면됨 하지만 이것도 좋은방법은 아님
+
+소스(자바파일)의 수정없이 실행될수있게 프로그래밍하는것이 유연함 프로그래밍이다
+
+스프링은 무조건 설정구동파일이 필요함 (new - spring bean configration file)
+bean은 객체라고 보면됨
+xml은 무조건 열었으면 닫아줘야함
+<bean></bean>해도되고 <bean id="" />이렇게해도됨
+bean등록
+<bean id="tv" class="polymorphism.SamsungTV"/> <---bean등록
+id(name써도됨)가 변수, class가 주소값 같은 느낌 
+뒤에 lazy-init="true" 해놓으면 부를때만 객체화됨
+기본적으로 false가 되어있고 부르지않더라도 한번 객체화가됨
+스프링은 기본적으로 bean등록을 꼭 해줘야한다
+스프링은 한번 객체화가 되면 그걸 계속 돌려쓴다(마치 싱글톤처럼)
+EX) 내가 처음 tmaxSpeaker를 불러서 객체화 했다면 다음에 tmaxSpeaker를 부르면 아까 객체화 해놨던 tamxSpeaker를 보내준다
+
+언제 상속을 받을거고, 언제 변수를 선언해서 객체를 생성할건가
+isB는 상속 - Tv라는 부모가있고 삼성Tv가 있을때 이때 삼성Tv는 Tv상속받음
+hasB - 삼성Tv와 TmaxSpeaker는 부모 관계가 아니기때문에 상속받지않고 생성해서 씀 
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+<bean id="tv" class="polymorphism.SamsungTV">
+	<constructor-arg ref="tmax"/>                            A.여기에 tmax는 밑의polymorphism.TmaxSpeaker를 의미
+						        만약 여기에 constructor를 안적는다면 기본생성자가 생성되고
+						        적는다면 ref에 적힌 tmax를 쓸수있는 SmasungTV의생성자를 찾아서 생성함
+						        ref에 들어가는건 누군가의 id값(bean의 id값을 적어야함)
+							[id값과 아규먼트를 확인]
+</bean>
+<bean id="tamx" class="polymorphism.TmaxSpeaker"/>
+bean등록의 순서는 상관없음 위에 constructor에 tmax를 쓰고 나중에 tmax bean을 적더라도 알아서 유연하게 처리됨
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+<bean id="tv" class="polymorphism.SamsungTV">
+	<constructor-arg index="0" ref="tmax"/>
+	<constructor-arg index="1" value="2"/>
+</bean>
+<bean id="tamx" class="polymorphism.TmaxSpeaker"/>
+만약 이렇게 2개의 값을 constructor 되어있다면 tmax도 쓸수있고 2도 쓸수있는 SamsungTV의 생성자를 찾아서 그걸 객체화 한다
+index를 달아놓는다면 인덱스 순서에 맞게 아규먼트가 들어가있는(ex 첫번째는tmax 두번째는 2)생성자를 찾아서 객체화함 
+(쓸상황이 생기는거 아니면 굳이 적어놓진 말자)
+constructor-arg의 순서 - 왠만하면 상관없지만 생성자중에 (tmax, int a) / (int a, tmax) 이렇게 된애가 있으면 상관있지만 그럴일은 없을거기때문에 상관없다고 보면됨
+		     - 상관없더라도 왠만하면 순서맞춰서 적자
+lazy-init을 언제쓸지
+<bean id="appleSpeaker" class="polymorphism.AppleSpeaker" lazy-init="true"/>
+<bean id="tMaxspeaker" class="polymorphism.AppleSpeaker" lazy-init="true"/>
+요렇게 스피커를 2개 놔두고 골라쓸때 lazy-init으로 쓰는것만 객체화되게 만듬
+ㅡㅡㅡㅡㅡㅡㅡㅡ여기까진 생성자를 이용해서 넣는방법ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+setter로 넣는방법
+<bean id="tv" class="polymorphism.SamsungTV">
+	<property name="speaker" ref="appleSpeaker"/> <===========이부분(property가 setter)
+								name에는 멤버필드의 변수명을 적어줌
+								ref는 밑에 bean의 id를 적어줌
+								bean등록하면서 참조하여 값을 넣어주는방법
+</bean>
+<bean id="appleSpeaker" class="polymorphism.AppleSpeaker" lazy-init="true"/>
+혹시 밑의 탭에 Namespaces 가 없다면
+applcationContext.xml 우클릭 - open with - spring config editor
+저거 누르면 우리가 쓸수있는것들이 나와있음
+거기서 p 추가
+xmlns:p="http://www.springframework.org/schema/p" 그럼 윗줄에 이렇게 추가돼있음
+jstl에 c,fn 처럼 이제 p를 쓸수있음
+<bean id="tv" class="polymorphism.SamsungTV" p:speaker-ref="appleSpeaker">
+</bean>
+<bean id="appleSpeaker" class="polymorphism.AppleSpeaker" lazy-init="true"/>
+<bean id="tMaxSpeaker" class="polymorphism.TmaxSpeaker" lazy-init="true"/>
+<property name="speaker" ref="appleSpeaker"/>를 쓰던걸 이런식으로 바꿀수도있음
+그런데 선생님은 안쓴다고함(갠취)
+
+<bean id="col" class="polymorphism.CollectionBean">
+	<property name="addressList">
+		<list>
+			<value>서울</value>
+			<value>대전</value>
+			<value>대구</value>
+			<value>부산</value>
+		</list>
+	</property>
+</bean>
+bean등록할때 직접 값을 집어넣는방법 <value>로 넣음 (이건 list에다가 값을 넣는방법)
+
+bean등록 방법 2개 (둘이 같이써도됨 적절하게 사용하면됨)
+1. 위에 했던것처럼 xml로 넣는거 (장점: 바꾸기가 쉽다)
+2. 이노테이션? (장점: 간단하다)
+
+에노테이션 쓰는방법
+Namespaces 탭에서 context 체크
+<context:component-scan base-package="polymorphism"></context:component-scan>   <==적어줌
+				    여기(polymorphism자리)에 기본패키지를 적어줘야함
+이거 적어주는게 필수 얘가 패키지를 돌아다니면서 객체화해줌
+
+bean등록할 클래스 위에다가 @Component를 적어주면 이렇게하면 bean등록된거
+ex)
+@Component("tv")  <---이렇게하면 tv로 호출가능
+public class LgTV{}
+Component만 적으면 <bean class="polymorphism.SamsungTV"> 안적으면 getBean 할때 자동으로 lgtv로 들어감
+Component("tv")를 적으면 <bean id="tv" class="polymorphism.SamsungTV"> 라고 보면됨
+
+TmaxSpeaker에 @Component를 달아놓고
+LgTV에서 밑에처럼 해놓으면 자동연결
+@Autowired <--  bean으로 만들수있는것중에 Speaker에 들어갈수 있는게 있다면 자동으로 연결해준다
+private Speaker speaker;
+Speaker에 들어갈수있는 bean이 여러개이거나 없으면 에러가뜸
+여기서 TmaxSpeaker 썻다가 AppleSpeaker 썻다가 바꾸고 싶으면
+TmaxSpeaker의 @Component를 지워주고
+xml에서 <bean class="polymorphism.AppleSpeaker"/> 해준다
+다른방법은 프로젝트에 필기해놨는데 썜이 거의 이방식으로 쓴다고함
+
+
+
+
+
+
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+우리가쓸거
+src/main/java
+src/main/resources
+테스트할때 쓰는거
+src/test/java
+src/test/resources
+
+Maven Dependencies
+Maven을 만들면 Maven을 관리해주는 폴더가 생김 거기에 라이브러리들을 참조함
+(jstl도 여기 들어있음)
+
+Matzip에서의 res폴더의 역할을 webapp의 resources 폴더가 해준다
+WEB-INF에서 veiws는 jsp파일 spring은 설정파일

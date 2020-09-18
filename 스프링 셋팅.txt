@@ -1,3 +1,5 @@
+XML파일은 서버를 내렸다 올리면 무조건 다시켜야함
+
 ㅡ mybatis 쓰는방법 
 구글에서 maven mybatis 검색 제일위에꺼(org.mybatis - Maven Repository) 클릭 - mybatis - 3.5.5클릭 - 
 maven 복사해서 밑에 붙여넣기
@@ -83,3 +85,71 @@ web.xml에 UTF-8인코딩설정
 	<filter-name>encodingFilter</filter-name>
 	<url-pattern>/*</url-pattern>
 </filter-mapping>
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+---- src - main - webapp - WEB-INF - spring - appServlet - servlet-context.xml 설정 ----
+	property는 메소드(set), constructior는 생성자로 값을넣음
+	value는 값을 넣는거고 ref는 참조하는것(bean생성으로 만들어놓은것만 참조 가능)
+
+<annotation-driven /> @Controller 붙은애들이 맵핑담당이라고 알려줌, 이걸 안적으면 Controller가 없는거라고 생각하면됨
+<context:component-scan base-package="com.koreait.matzip" /> 에노테이션 붙은애들을 스캔함
+!!!!!이거 2개는 필수!!!!!
+
+<resources mapping="/res/**" location="/resources/" /> MatZip에서 StaticContainer를 만드는것(res로 들어오는걸 잡아내기위해 만들었던것)
+		res로 접근하는애들은 전부 resources로 보낸다는것
+		**은 어떤이름이든 몇단계가 들어가든 전부 resources로 보낸다는것
+보통 resources에는 이미지, css, js같은걸 넣어둠
+
+<beans:bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<beans:property name="prefix" value="/WEB-INF/views/" />
+		<beans:property name="suffix" value=".jsp" />
+</beans:bean>
+VeiwResolver
+리턴으로 들어온값의 앞에는 /WEB-INF/views/이걸 붙이고 뒤에는 .jsp이걸 붙여준다
+String만 넣더라도 jsp파일을 알아서 찾아열기위한것
+return "home"만 하는이유
+
+-Hikari설정(DB)-
+<beans:bean id="hikariConfig" class="com.zaxxer.hikari.HikariConfig">
+(안써도됨)<beans:property name="poolName" value="springHikariCP" />  == ConectionPull에 이름 부여
+(안써도됨)<beans:property name="connectionTestQuery" value="SELECT 1" />  == 재대로 연결됐나 한번 날려보는거, 이건 mysql만 가능 oracle이면 에러터짐(oracle은 SELECT 1 FROM DUAL)해줘야함, 걍 둘다쓰기위해 FROM DUAL 붙여줬음
+	<beans:property name="driverClassName" value="com.mysql.cj.jdbc.Driver" /> ==커넥션 연결할때 썻던 Driver 주소 (DAO에 적던거)
+(안써도됨)<beans:property name="maximumPoolSize" value="10" /> == 몇개의 Pool을 미리 만들어 놓을것인가 (미리 10개를 만들어놓고 DB연결할때마다 하나씩 빌려씀)
+(안써도됨)<beans:property name="idleTimeout" value="5000" /> == DB가 5000(5초?50초?)동안 반응이 없다면 컷하는것
+	    
+	<beans:property name="jdbcUrl" value="jdbc:mysql://127.0.0.1:3306/matzip?characterEncoding=UTF-8"/> (DAO에 적던건가???)
+	<beans:property name="username" value="root"/> == DB 아이디 (DAO에 적던거)
+	<beans:property name="password" value="koreait2020"/>   == DB 비밀번호 (DAO에 적던거)
+	
+	데이터소스를 만들어줘야함(위의 정보로 히카리가 객체화됨)
+	<beans:bean id="dataSource" class="com.zaxxer.hikari.HikariDataSource" destroy-method="close">
+					이런거 HDS 컨트롤+스페이스하면 알아서 완성해줌
+		<beans:constructor-arg ref="hikariConfig"/>
+		<!-- ref(참조)에는 생성해놓은 bean의 id값을 적어야함 -->
+	</beans:bean>
+
+---마이바티스 설정(팩토리 : 객체생성 담당) (DB에서 값을 받아와서 저장함)
+<beans:bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+	<beans:property name="dataSource" ref="dataSource"/> == 얘는 데이터소스를 참조해서 dataSourc에다가 넣어줌
+	<beans:property name="configLocation" value="/WEB-INF/spring/mybatis-alias.xml"/> == /WEB-INF/spring/mybatis-alias.xml파일을 configLocation에 넣어줌
+			/WEB-INF/spring/mybatis-alias.xml파일을 만들어줘야함(이름은 마음대로 바꿔도됨)
+</beans:bean>
+		----mybatis-alias.xml 
+		<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-config.dtd">
+		이거 꼭 적어줘야함 mybatis 홈페이지 - 시작하기 - <!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-config.dtd"> 복사해서 붙여넣기
+		<configuration>
+			<typeAliases>
+			</typeAliases>
+		</configuration>
+
+---- 마이바티스의 스캐너, 마이바티스가쓰는 이노테이션 (@mapper), 마이바티스는 DAO를 bean등록함 
+<mybatis-spring:scan base-package="com.koreait.matzip"/> == base-pakage에 프로젝트주소
+						==처음 넣으면 빨간줄뜸 Namespaces에서mybatis-spring을 import해줘야함
+
+</beans:bean>
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+
+
+

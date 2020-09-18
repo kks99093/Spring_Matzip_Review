@@ -1,0 +1,21 @@
+- 네이밍 규칙 -
+동사 앞, 명사 뒤
+
+클래스명 파스칼(_언더바 안씀)
+메소드명,변수명(DB관련X) 카멜 케이스 기법 사용
+사용자 정의(우리가 만드는) 메소드명 앞에는_(언더바) 붙인다 / 내가만든거 남이만든거 구분이 쉬움
+VO 변수명 단어 구분은 _(언더바)
+
+MODEL [DMI와 DTO는 VO를 상속받을거)
+DMI(Domain) select 결과용 //return 받을때 
+DTO - select, parameter 용 // DAO까지 전달용
+VO - insert, update, delete용
+
+CRUD
+(Java, DB)
+ins___
+sel___/sel___List
+upd___
+del___
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ

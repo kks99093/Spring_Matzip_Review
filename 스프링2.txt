@@ -1,0 +1,84 @@
+HomeController
+얘는 꼭 @Controller라고 적혀있어야함 
+@RequestMapping(value = "/", method = RequestMethod.GET) ㅡㅡ  Matzip때 만들었던 HandllerMapper라고 보면됨, 여기 벨류에 맵핑할주소를적음(우리가 서블릿에서 맵핑해줬던거처럼)
+			Post로 받고싶다면 method부분을 POST로 바꿔주면됨 (기본은 GET임)
+얘는 꼭 @Controller적힌곳에 있어야함
+@RequestMapping(value="hehe")는 class위에도 줄수있음 그렇게되면 1차 주소가 hehe가됨 (EX - localhost:8090/hehe/jsp파일맵핑)
+
+logger.info("Welcome home! The client locale is {}.", locale); ㅡㅡ	얘는 콘솔에 그냥 찍어보는거
+model.addAttribute("serverTime", formattedDate ); ㅡㅡ	우리가 request.setAttribute 하던거
+						model이 request에서 setAttribute하는 역할 / 만약에 Model을 쓰기싫다면 HttpServletRequest request써도됨(오리지날을 추구한다면)
+return "home"; ㅡㅡ   views 아래의 home.jsp파일을 찾아서 열어줌
+
+이건 그냥 현재시간찍어주는거 (샘플로 이렇게 나온다라고 적어놓은듯)
+Date date = new Date();
+DateFormat dateFormat = DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.LONG, locale);
+String formattedDate = dateFormat.format(date);
+
+스프링에서는 view Controller Service DAO만 만들어주면된다
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+src - main - webapp - WEB-INF - spring - appServlet - servlet-context.xml 설정
+<annotation-driven /> @Controller 붙은애들이 맵핑담당이라고 알려줌, 이걸 안적으면 Controller가 없는거라고 생각하면됨
+<context:component-scan base-package="com.koreait.matzip" /> 에노테이션 붙은애들을 스캔함
+!!!!!이거 2개는 필수!!!!!
+
+<resources mapping="/res/**" location="/resources/" /> MatZip에서 StaticContainer를 만드는것(res로 들어오는걸 잡아내기위해 만들었던것)
+		res로 접근하는애들은 전부 resources로 보낸다는것
+		**은 어떤이름이든 몇단계가 들어가든 전부 resources로 보낸다는것
+보통 resources에는 이미지, css, js같은걸 넣어둠
+
+<beans:bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<beans:property name="prefix" value="/WEB-INF/views/" />
+		<beans:property name="suffix" value=".jsp" />
+</beans:bean>
+VeiwResolver
+리턴으로 들어온값의 앞에는 /WEB-INF/views/이걸 붙이고 뒤에는 .jsp이걸 붙여준다
+String만 넣더라도 jsp파일을 알아서 찾아열기위한것
+return "home"만 하는이유
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+1.UserController - Matzip에서 쓰던 컨트롤러
+2.UserService - Matzip에서 쓰던 서비스
+3.UserMapper.xml (<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Config 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">)
+마이바티스 쓸거면 저걸 꼭 넣어줘야함
+제일마지막에 config.dtd를 mapper.dtd로 / DOCTYPE 옆의 configuration 를 mapper로 바꿔줘야함
+인터페이스랑 xml파일은 꼭 같은이름,같은위치에 있어야함
+<mapper namespace="com.koreait.matzip.user.UserMapper">
+	namespace에는얘랑 연결되는 인터페이스의 풀네임을 적어줌
+	<insert id="insUser" parameterType="com.koreait.matzip.user.model.UserVO"> //Insert부분
+		INSERT INTO t_user
+		(user_id, user_pw, salt, nm)
+		VALUES
+		(#{user_id}, #{user_pw}, #{salt}, #{nm}) 
+		여기 EL식비슷하게 가능
+		#을쓰면 타입을 String,int 등등 맞춰서 넣어줌
+		$을 쓰면 전부 ''를 붙여서 넣어줌
+	</insert>
+</mapper>
+
+CRUD중에 뭘 쓸지는 <insert id=2#%@#%@#>에 적어놨음
+id 는 UserMapper(인터페이스의 매소드명과 같아야함)
+parameterType 는  UserMapper(인터페이스 메소드에 넣어놓은 파라미터의 풀주소값을 넣음)
+mybatis-alias에 <typeAlias type="com.koreait.matzip.user.model.UserVO" alias="UserVO" />를 적어주면
+UserVO만 적어줘도됨
+
+4.UserMapper(인터페이스) - DAO (DATABACE 연결하는 새로운 방식)
+public int insUser(UserVO p);
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+<!-- class위에 @를 적는건 99% bean등록 -->
+@Controller는 MatZip때썻던 HandllerMapper를 만들기위한 정보가 담겨있는곳
+@Service는 진짜 걍 bean등록
+@mapper는 bean등록은 아니고 mybatis가 쓰는애인데 인터페이스에서 mapper를 찾고 
+	얘랑 연결되어있는 xml을 찾아서 DAO를 만듬
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+@RequestMapping(value="/join", method = RequestMethod.GET)
+	public String join(Model model,@RequestParam int err) {
+	//@RequestParam ==> 한값만 받을떄 쓰는것, 원래는 무조건 String이지만 바로 int를 적을수있다
+	//쿼리스트링에 보내는 키값과 저기에 적은벼수(err)이 같다면 @RequestParam(required=false) int err이렇게만적어도됨
+	//다르다면 @RequestParam(value="err", required=false) int error라고 적어줘야함
+	// required =>필수인지 묻는것 첫페이지에는 없다가 에러떳을때만 생김으로 false를 줘야함
+	model.addAttribute(Const.TITLE, "회원가입");
+	model.addAttribute(Const.VIEW, "user/join");
+	return ViewRef.TEMP_DEFAULT;
+}

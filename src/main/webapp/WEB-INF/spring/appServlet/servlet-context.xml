@@ -3,26 +3,60 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xmlns:beans="http://www.springframework.org/schema/beans"
 	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mybatis-spring="http://mybatis.org/schema/mybatis-spring"
 	xsi:schemaLocation="http://www.springframework.org/schema/mvc https://www.springframework.org/schema/mvc/spring-mvc.xsd
+		http://mybatis.org/schema/mybatis-spring http://mybatis.org/schema/mybatis-spring-1.2.xsd
 		http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd
 		http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd">
 
 	<!-- DispatcherServlet Context: defines this servlet's request-processing infrastructure -->
 	
 	<!-- Enables the Spring MVC @Controller programming model -->
+	<!-- class위에 @를 적는건 99% bean등록 -->
 	<annotation-driven />
 
 	<!-- Handles HTTP GET requests for /resources/** by efficiently serving up static resources in the ${webappRoot}/resources directory -->
-	<resources mapping="/resources/**" location="/resources/" />
-
+	<resources mapping="/res/**" location="/resources/" />
+	<!-- res로 접근하는애들은 전부 resources로 보낸다는것 -->
 	<!-- Resolves views selected for rendering by @Controllers to .jsp resources in the /WEB-INF/views directory -->
 	<beans:bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
 		<beans:property name="prefix" value="/WEB-INF/views/" />
 		<beans:property name="suffix" value=".jsp" />
 	</beans:bean>
-	
+	<!-- 얘는 spring에서 스는 이노테이션 -->
 	<context:component-scan base-package="com.koreait.matzip" />
+	<!-- 에노테이션 붙은애들을 전부 스캔함 -->
 	
+	<!-- property는 메소드(set), constructior는 생성자로 값을넣음 -->
+	<!-- value는 값을 넣는거고 ref는 참조하는것(bean생성으로 만들어놓은것만 참조 가능) -->
 	
+	<!-- DB연결 ConnectionPull 제작 -->
+	<beans:bean id="hikariConfig" class="com.zaxxer.hikari.HikariConfig">
+	    <beans:property name="poolName" value="springHikariCP" />
+	    <beans:property name="connectionTestQuery" value="SELECT 1 FROM DUAL" />
+	    <beans:property name="driverClassName" value="com.mysql.cj.jdbc.Driver" />
+	    <beans:property name="maximumPoolSize" value="10" />
+	    <beans:property name="idleTimeout" value="5000" />
+	    
+	    <beans:property name="jdbcUrl" value="jdbc:mysql://127.0.0.1:3306/matzip?characterEncoding=UTF-8"/>
+		<beans:property name="username" value="root"/>
+		<beans:property name="password" value="koreait2020"/> 
+	</beans:bean>
+	
+	<beans:bean id="dataSource" class="com.zaxxer.hikari.HikariDataSource" destroy-method="close">
+		<beans:constructor-arg ref="hikariConfig"/>
+		<!-- ref(참조)에는 생성해놓은 bean의 id값을 적어야함 -->
+	</beans:bean>
+	
+	<!-- 마이바티스 설정 -->
+	<beans:bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<beans:property name="dataSource" ref="dataSource"/> 
+		<beans:property name="configLocation" value="/WEB-INF/spring/mybatis-alias.xml"/>
+		<!-- /WEB-INF/spring/mybatis-alias.xml 파일 만들어줘야함/ 저파일을 configLocation에다가 넣음 -->
+	</beans:bean>
+	
+	<!-- 마이바티스의 스캔, 마이바티스가쓰는 이노테이션 (@mapper) -->
+	<mybatis-spring:scan base-package="com.koreait.matzip"/>
+	<!-- 마이바티스는 DAO를 bean등록함 -->
 	
 </beans:beans>
