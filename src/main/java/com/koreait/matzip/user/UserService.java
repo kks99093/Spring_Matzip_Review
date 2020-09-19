@@ -19,11 +19,17 @@ public class UserService {
 	public int login(UserDTO param) {
 		if(param.getUser_id().equals("")) {
 			return Const.NO_ID;
-		}		
+		}
+		UserDMI dbUser = null;
 		
-		UserDMI dbUser = mapper.selUser(param);
+		try {
+			dbUser = mapper.selUser(param);
+		}catch(Exception e) {
+		}
 		
-		if(dbUser.getI_user() == 0) {
+		
+		
+		if(dbUser == null) {
 			return Const.NO_ID;
 		}else {
 			String salt = dbUser.getSalt();
@@ -44,7 +50,13 @@ public class UserService {
 		
 		param.setSalt(salt);
 		param.setUser_pw(cryptPw);
-		return mapper.insUser(param);
+		int result = -1;
+		try {
+			result = mapper.insUser(param);
+		}catch(Exception e) {
+			result = 2;
+		}
+		return result;
 	}
 
 }

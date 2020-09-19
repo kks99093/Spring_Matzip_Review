@@ -2,8 +2,8 @@
     pageEncoding="UTF-8"%>
 <div id="join_sectionContainerCenter">
 	<div = class="join_div">
-		<div class="msg">${msg}</div>
 		<form id="frm" class="join_form" action="/user/join" method="post" onsubmit="return chk()">
+			<div class="msg">${msg}</div>
 			<div id="idChkResult" class="msg"></div>
 			<div><input type="text" name="user_id" placeholder="아이디">
 				<button type="button" onclick="chkId()" name="user_idchk">아이디 중복체크</button>

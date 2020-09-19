@@ -1,8 +1,9 @@
 package com.koreait.matzip;
 
+import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 
-import com.oreilly.servlet.MultipartRequest;
+import org.springframework.web.multipart.MultipartRequest;
 
 public class CommonUtils {
 	public static int parseStrToInt(String str) {
@@ -22,7 +23,7 @@ public class CommonUtils {
 	}
 	
 	public static int getIntParameter(MultipartRequest request, String keyNm) {
-		return parseStrToInt(request.getParameter(keyNm));
+		return parseStrToInt(((ServletRequest) request).getParameter(keyNm));
 	}
 	
 	public static double parseStrToDouble(String str) {
